@@ -12,6 +12,18 @@ from numeric_eval.check import compare_values
 
 
 class NumericEvalRunnerTests(unittest.TestCase):
+    def test_sandbox_can_return_a_backtest_report_without_grading_it(self):
+        report = {"case_id": "case", "summary": {"total_pnl": 20.0}}
+        outputs = [
+            subprocess.CompletedProcess([], 0, stdout="container-id\n"),
+            subprocess.CompletedProcess([], 0, stdout="0\n"),
+            subprocess.CompletedProcess([], 0, stdout=json.dumps(report)),
+            subprocess.CompletedProcess([], 0, stdout=""),
+        ]
+        with patch("numeric_eval_runner.subprocess.run", side_effect=outputs):
+            actual = runner.run_container("case", "sha256:test", Path("/tmp/inputs"))
+        self.assertEqual(actual, report)
+
     def test_refuses_changed_baseline_before_docker(self):
         with TemporaryDirectory() as directory:
             folder = Path(directory)

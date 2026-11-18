@@ -113,3 +113,40 @@ were removed. Static reviews and original model responses were not modified.
 Docker references: [runtime restrictions](https://docs.docker.com/engine/containers/run/),
 [security boundaries](https://docs.docker.com/engine/security/), and
 [bounded logs](https://docs.docker.com/engine/logging/drivers/json-file/).
+
+## Daily-price backtest
+
+With the sandbox image built and Docker running:
+
+```sh
+source .venv/bin/activate
+python backtest.py
+```
+
+Enter one ticker and exact `YYYY-MM-DD` start/end dates. Start is inclusive;
+end is exclusive. `download_daily_prices` fetches adjusted daily Open/Close
+prices from yfinance. At least 21 returned bars are required for the current
+5/20 SMA crossover to compare both current and previous complete windows.
+
+This command runs the already reviewed and hash-pinned
+`moving_average_execution_timing` strategy, using 5/20 windows and initial cash
+100000. It prints a summary, trade count, actual data dates, parameters, and
+provenance hashes. It does not generate a new strategy or place trades.
+
+The host downloads and validates prices, then stages only the prices, their
+date index, the pinned strategy, and the trusted container entry point. The
+strategy runs in the same restricted offline Docker environment as the
+numerical checks. Docker unavailability stops the flow without host execution.
+Neither `.env` nor OpenAI is used in the download/backtest path.
+
+Unit tests mock price-provider and Docker calls. A separate wiring check used
+a mocked 25-bar download with the real sandbox: one open trade produced the
+expected P&L of 20000 and account return of 0.20. This is test-only input;
+the app has no sample-data fallback.
+
+A live AAPL check requested 2025-01-01 through 2025-04-01 (exclusive). It
+returned 60 bars, from 2025-01-02 through 2025-03-31, and one closed trade.
+The actual summary key was `total_pnl`, with value -628.8905188715553;
+`portfolio_return` was -0.006288905188715553. The run used the reviewed
+5/20 strategy and initial cash 100000 inside the sandbox, without OpenAI or
+trade placement. These values describe that historical download and period.

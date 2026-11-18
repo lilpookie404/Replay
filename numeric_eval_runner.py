@@ -67,7 +67,7 @@ def container_command(name, image, inputs):
     ]
 
 
-def run_container(case_id, image, inputs, expected_checks):
+def run_container(case_id, image, inputs, expected_checks=None):
     name = f"replay-numeric-{uuid.uuid4().hex}"
     try:
         subprocess.run(container_command(name, image, inputs),
@@ -85,10 +85,11 @@ def run_container(case_id, image, inputs, expected_checks):
         report = json.loads(logs.stdout)
         if not isinstance(report, dict):
             raise ValueError("Sandbox report must be a JSON object")
+        if report.get("case_id") != case_id:
+            raise ValueError("Sandbox report has the wrong case ID")
         checks = report.get("checks", [])
-        if (not isinstance(checks, list)
+        if expected_checks is not None and (not isinstance(checks, list)
                 or not all(isinstance(check, dict) for check in checks)
-                or report.get("case_id") != case_id
                 or [check.get("id") for check in checks] != expected_checks
                 or not all(type(check.get("passed")) is bool for check in checks)):
             raise ValueError("Sandbox report has missing or invalid checks")

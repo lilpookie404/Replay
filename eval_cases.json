@@ -1,0 +1,54 @@
+[
+  {
+    "id": "moving_average_execution_timing",
+    "idea": "Generate a long-only moving-average crossover backtest using daily Open and Close prices. Buy when the 5-day SMA crosses above the 20-day SMA; sell when it crosses below. Detect signals at the close and execute at the next bar's open.",
+    "expected_explanation": [
+      "Describe both entry and exit conditions, and distinguish the signal bar from the next bar where the trade fills.",
+      "State that trade logs and return calculations use the same execution timestamps and prices, including the same fee and slippage assumptions."
+    ],
+    "expected_code": [
+      "Compute crossover signals from closing prices without using future data to decide the signal.",
+      "Record entries and exits at the next bar's timestamp and Open price, rather than the crossover bar's Close price.",
+      "Calculate position exposure and returns consistently with those fill prices. A simple shifted-position close-to-close calculation must not be presented as equivalent to next-open fills.",
+      "Using deterministic sample prices, P&L derived from logged fills must reconcile with the corresponding strategy equity change under the stated assumptions, accounting separately for any open position.",
+      "Do not record an executed trade for a last-bar signal when no following bar exists.",
+      "Provide one coherent backtest implementation without placeholder trade logic or discarded backtest loops.",
+      "Wait for complete moving-average windows before comparing indicators; do not compare partially warmed averages.",
+      "Calculate closed-trade summary statistics using valid boolean masks on realized P&L, and handle empty win/loss groups without errors."
+    ]
+  },
+  {
+    "id": "invalid_moving_average_windows",
+    "idea": "Generate a moving-average crossover backtest that rejects invalid window sizes with clear errors. Cover fast=0, slow=20; fast=-5, slow=20; fast=5, slow=0; and fast=5, slow=-20. Also reject a slow window smaller than the fast window.",
+    "expected_explanation": [
+      "State that both windows must be positive integers and that slow must be greater than or equal to fast.",
+      "Explain that invalid window sizes are rejected rather than silently changed or used to calculate indicators."
+    ],
+    "expected_code": [
+      "Validate fast and slow independently before calling rolling calculations; checking only slow < fast is insufficient.",
+      "Raise a clear ValueError for every listed zero or negative window case, identifying the invalid parameter.",
+      "Reject noninteger windows and slow < fast; retain support for valid positive windows such as fast=5, slow=20."
+    ]
+  },
+  {
+    "id": "unfinished_open_trade",
+    "idea": "Generate a long-only 5-day/20-day moving-average crossover backtest using daily Open and Close prices and a supported positive integer qty. Include examples with qty=2. Wait for complete moving-average windows, detect signals at the close, and fill only at the next bar's Open. Cover both a completed trade and a buy that fills with no later sell before the data ends: leave that position open and include the unfinished trade in the trade log. A signal on the last bar must remain unfilled because there is no next Open; never fall back to that bar's Close. Calculate realized and unrealized P&L and fractional returns correctly for qty > 1. Show hand-checked examples: entry=100, exit=110, qty=2 gives P&L=20 and return=0.10; entry=100, final Close=105, qty=2 gives unrealized P&L=10 and unrealized return=0.05. Summary formulas must remain correct for any supported quantity.",
+    "expected_explanation": [
+      "Explain that the position remains open at the end of the data and has no realized exit or realized trade return.",
+      "Distinguish any unrealized mark-to-market P&L included in final equity from realized P&L on completed trades.",
+      "Explain that quantity scales currency P&L but leaves the fractional return unchanged for the same price move; identify the capital denominator for any portfolio-summary return."
+    ],
+    "expected_code": [
+      "Retain the actual entry timestamp and fill price, and record the unfinished trade exactly once.",
+      "Use None for exit_time, exit_price, and realized trade return; do not invent a closing fill at the last observed price.",
+      "Keep the position open through the final available bar. If equity includes unrealized P&L, calculate and label it separately from realized trade results.",
+      "Use the same entry execution convention in the open-trade log and in the strategy return calculation.",
+      "Leave final-bar signals unfilled; never use a last-bar Close fallback for either an entry or an exit.",
+      "Wait for the full 5-day and 20-day windows before comparing averages; do not use min_periods=1 to compare averages built from different amounts of history.",
+      "For closed trades, compute realized P&L = (exit_price - entry_price) * qty and realized return = realized P&L / (entry_price * qty), with valid positive denominators.",
+      "For open trades, compute unrealized P&L = (final_close - entry_price) * qty and unrealized return = unrealized P&L / (entry_price * qty); keep realized fields None.",
+      "Verify the non-unit examples in the idea: qty=2 gives realized P&L 20 and return 0.10 for 100 to 110, and unrealized P&L 10 and return 0.05 for 100 to 105. For qty=1, those P&L values halve while fractional returns stay unchanged.",
+      "Aggregate summary P&L from the trade records and use a documented, quantity-consistent denominator for any reported summary return."
+    ]
+  }
+]

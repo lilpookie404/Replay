@@ -1,0 +1,42 @@
+{
+  "case_id": "sandbox_probe",
+  "checks": [
+    {
+      "id": "uid",
+      "passed": true
+    },
+    {
+      "id": "readonly_root",
+      "passed": true
+    },
+    {
+      "id": "readonly_inputs",
+      "passed": true
+    },
+    {
+      "id": "no_credentials",
+      "passed": true
+    },
+    {
+      "id": "network",
+      "passed": true
+    },
+    {
+      "id": "capabilities",
+      "passed": true
+    },
+    {
+      "id": "resource_limits",
+      "passed": true
+    },
+    {
+      "id": "tmpfs",
+      "passed": true
+    }
+  ],
+  "environment": {
+    "pandas": "2.2.3",
+    "numpy": "2.1.3"
+  },
+  "sandbox_image_id": "sha256:6134909c2362fd498624e4690803043343f0dd78844a9f87725ed9dc5e7ce033"
+}

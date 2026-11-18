@@ -1,0 +1,45 @@
+{
+  "results_file": "eval_results_20261118T041241597328Z.jsonl",
+  "results_sha256": "f9dbdd4d99db7b90e542a12f5fcea9629323cc90c04b5ab4bf2b56726f9646f9",
+  "review_method": "Static source review",
+  "reviewer": "Codex",
+  "generated_code_executed": false,
+  "scope": "Review against the criteria saved with this run, using valid positive price inputs. Structure and Python syntax were checked. Generated functions, examples, and numerical reconciliation were not executed.",
+  "baseline_results_file": "eval_results_20261117T185528494054Z.jsonl",
+  "comparison_note": "The suite remains three requests. The unfinished_open_trade case now includes completed-trade and open-trade scenarios at qty=2. That input and the shared instructions both changed; one sample per case does not establish a general improvement rate.",
+  "line_numbering": "Findings cite 1-based lines of each record's response text.",
+  "cases": [
+    {
+      "id": "moving_average_execution_timing",
+      "verdict": "pass",
+      "findings": [
+        "Lines 103-125 use full moving-average windows and require previous and current averages before producing signals. Lines 136-206 execute previous-close signals at the current Open; final-row signals cannot be filled.",
+        "Logged entry and exit prices, cash updates, closed-trade P&L, and end-of-day equity use the same fill convention. Realized and unrealized fractional returns divide by entry price times quantity at lines 192-194 and 222-224.",
+        "Lines 242-258 correctly select realized P&L and form boolean win/loss masks, with explicit handling of empty groups. The previous average_loss numeric-column-selection defect is absent.",
+        "Lines 270-278 aggregate realized and unrealized P&L and state initial_cash as the portfolio return denominator.",
+        "This is a static pass for the listed criteria under valid inputs. Numerical reconciliation and general input-edge behavior remain unverified."
+      ]
+    },
+    {
+      "id": "invalid_moving_average_windows",
+      "verdict": "pass",
+      "findings": [
+        "Lines 78-87 reject noninteger inputs, zero or negative windows, and slow < fast. The validator is called at line 114 before rolling calculations at lines 132-133.",
+        "Equal positive windows remain allowed because the ordering rejection is strictly slow < fast.",
+        "This pass is limited to the listed window-validation rules on static inspection; it does not validate the entire backtest."
+      ]
+    },
+    {
+      "id": "unfinished_open_trade",
+      "verdict": "pass",
+      "findings": [
+        "The code validates positive integer qty, uses complete moving-average windows, and prevents signals until previous and current averages are available.",
+        "Lines 137-157 and 166-189 require a next bar for entry and exit fills and never fall back to the final Close. Lines 194-207 preserve and append the unfinished trade once, leaving its realized and exit fields missing.",
+        "Lines 175-179 and 198-202 divide quantity-scaled realized and unrealized P&L by entry_price * qty. The known quantity-scaling defect is absent from both paths.",
+        "The hand-checked formulas at response lines 45-53 agree with qty=2 examples: 100 to 110 gives P&L 20 and return 0.10; marking 100 at 105 gives unrealized P&L 10 and return 0.05. With qty=1, currency P&L halves and those fractions remain unchanged. These are formula checks, not executed backtest tests.",
+        "Lines 225-249 aggregate P&L from trade records and document aggregate entry outlay as the summary-return denominator. This is a return on aggregate entry outlay, not a verified account-equity return.",
+        "Remaining limitations: denominator checks test nonzero rather than reject all invalid negative price inputs. The illustrative comment at line 312 incorrectly says identical same-bar Opens and Closes make fills equal the previous Close. These do not change the inspected qty=2 formulas, but the response is not broadly validated trading logic."
+      ]
+    }
+  ]
+}

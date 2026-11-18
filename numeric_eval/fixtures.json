@@ -1,0 +1,98 @@
+{
+  "fixtures": [
+    {
+      "id": "closed_and_open_qty1", "fast": 2, "slow": 3, "qty": 1, "initial_capital": 100,
+      "prices": {"Open": [100,100,100,100,100,100,110,100,100], "Close": [100,100,98,102,104,96,98,102,105]},
+      "expected": {
+        "trades": [
+          {"entry_index": 5, "exit_index": 6, "entry_price": 100, "exit_price": 110, "qty": 1, "realized_pnl": 10, "realized_return": 0.1, "unrealized_pnl": null, "unrealized_return": null},
+          {"entry_index": 8, "exit_index": null, "entry_price": 100, "exit_price": null, "qty": 1, "realized_pnl": null, "realized_return": null, "unrealized_pnl": 5, "unrealized_return": 0.05}
+        ],
+        "summary": {"realized_pnl": 10, "unrealized_pnl": 5, "total_pnl": 15, "wins": 1, "losses": 0}
+      },
+      "account_return": 0.15,
+      "entry_outlay_summary": {"return_denominator": 200, "return_fraction": 0.075, "aggregate_realized_return": 0.05, "aggregate_unrealized_return": 0.025},
+      "win_loss_means": {"mean_win": 10, "mean_loss": null}
+    },
+    {
+      "id": "closed_and_open_qty2", "fast": 2, "slow": 3, "qty": 2, "initial_capital": 200,
+      "prices": {"Open": [100,100,100,100,100,100,110,100,100], "Close": [100,100,98,102,104,96,98,102,105]},
+      "expected": {
+        "trades": [
+          {"entry_index": 5, "exit_index": 6, "entry_price": 100, "exit_price": 110, "qty": 2, "realized_pnl": 20, "realized_return": 0.1, "unrealized_pnl": null, "unrealized_return": null},
+          {"entry_index": 8, "exit_index": null, "entry_price": 100, "exit_price": null, "qty": 2, "realized_pnl": null, "realized_return": null, "unrealized_pnl": 10, "unrealized_return": 0.05}
+        ],
+        "summary": {"realized_pnl": 20, "unrealized_pnl": 10, "total_pnl": 30, "wins": 1, "losses": 0}
+      },
+      "account_return": 0.15,
+      "entry_outlay_summary": {"return_denominator": 400, "return_fraction": 0.075, "aggregate_realized_return": 0.05, "aggregate_unrealized_return": 0.025},
+      "win_loss_means": {"mean_win": 20, "mean_loss": null}
+    },
+    {
+      "id": "closed_win_no_open_trade", "fast": 2, "slow": 3, "qty": 2, "initial_capital": 200,
+      "prices": {"Open": [100,100,100,100,100,100,110], "Close": [100,100,98,102,104,96,98]},
+      "expected": {
+        "trades": [{"entry_index": 5, "exit_index": 6, "entry_price": 100, "exit_price": 110, "qty": 2, "realized_pnl": 20, "realized_return": 0.1, "unrealized_pnl": null, "unrealized_return": null}],
+        "summary": {"realized_pnl": 20, "unrealized_pnl": 0, "total_pnl": 20, "wins": 1, "losses": 0}
+      },
+      "account_return": 0.1,
+      "entry_outlay_summary": {"return_denominator": 200, "return_fraction": 0.1, "aggregate_realized_return": 0.1, "aggregate_unrealized_return": 0},
+      "win_loss_means": {"mean_win": 20, "mean_loss": null}
+    },
+    {
+      "id": "closed_loss_no_wins", "fast": 2, "slow": 3, "qty": 2, "initial_capital": 200,
+      "prices": {"Open": [100,100,100,100,100,100,90], "Close": [100,100,98,102,104,96,98]},
+      "expected": {
+        "trades": [{"entry_index": 5, "exit_index": 6, "entry_price": 100, "exit_price": 90, "qty": 2, "realized_pnl": -20, "realized_return": -0.1, "unrealized_pnl": null, "unrealized_return": null}],
+        "summary": {"realized_pnl": -20, "unrealized_pnl": 0, "total_pnl": -20, "wins": 0, "losses": 1}
+      },
+      "account_return": -0.1,
+      "entry_outlay_summary": {"return_denominator": 200, "return_fraction": -0.1, "aggregate_realized_return": -0.1, "aggregate_unrealized_return": 0},
+      "win_loss_means": {"mean_win": null, "mean_loss": -20}
+    },
+    {
+      "id": "final_bar_buy_unfilled", "fast": 2, "slow": 3, "qty": 2, "initial_capital": 200,
+      "prices": {"Open": [100,100,100,100,100], "Close": [100,100,98,102,104]},
+      "expected": {"trades": [], "summary": {"realized_pnl": 0, "unrealized_pnl": 0, "total_pnl": 0, "wins": 0, "losses": 0}},
+      "account_return": 0,
+      "entry_outlay_summary": {"return_denominator": 0, "return_fraction": null, "aggregate_realized_return": null, "aggregate_unrealized_return": null},
+      "win_loss_means": {"mean_win": null, "mean_loss": null}
+    },
+    {
+      "id": "final_bar_sell_leaves_open_trade", "fast": 2, "slow": 3, "qty": 2, "initial_capital": 200,
+      "prices": {"Open": [100,100,100,100,100,100], "Close": [100,100,98,102,104,96]},
+      "expected": {
+        "trades": [{"entry_index": 5, "exit_index": null, "entry_price": 100, "exit_price": null, "qty": 2, "realized_pnl": null, "realized_return": null, "unrealized_pnl": -8, "unrealized_return": -0.04}],
+        "summary": {"realized_pnl": 0, "unrealized_pnl": -8, "total_pnl": -8, "wins": 0, "losses": 0}
+      },
+      "account_return": -0.04,
+      "entry_outlay_summary": {"return_denominator": 200, "return_fraction": -0.04, "aggregate_realized_return": 0, "aggregate_unrealized_return": -0.04},
+      "win_loss_means": {"mean_win": null, "mean_loss": null}
+    },
+    {
+      "id": "full_previous_window_required", "fast": 2, "slow": 3, "qty": 2, "initial_capital": 200,
+      "prices": {"Open": [100,100,100,100], "Close": [100,110,120,130]},
+      "expected": {"trades": [], "summary": {"realized_pnl": 0, "unrealized_pnl": 0, "total_pnl": 0, "wins": 0, "losses": 0}},
+      "account_return": 0,
+      "entry_outlay_summary": {"return_denominator": 0, "return_fraction": null, "aggregate_realized_return": null, "aggregate_unrealized_return": null},
+      "win_loss_means": {"mean_win": null, "mean_loss": null}
+    },
+    {
+      "id": "equal_positive_windows", "fast": 2, "slow": 2, "qty": 2, "initial_capital": 200,
+      "prices": {"Open": [100,100,100,100,100,100,110,100,100], "Close": [100,100,98,102,104,96,98,102,105]},
+      "expected": {"trades": [], "summary": {"realized_pnl": 0, "unrealized_pnl": 0, "total_pnl": 0, "wins": 0, "losses": 0}},
+      "account_return": 0,
+      "entry_outlay_summary": {"return_denominator": 0, "return_fraction": null, "aggregate_realized_return": null, "aggregate_unrealized_return": null},
+      "win_loss_means": {"mean_win": null, "mean_loss": null}
+    }
+  ],
+  "invalid_windows": [
+    {"id": "zero_fast", "fast": 0, "slow": 3},
+    {"id": "negative_fast", "fast": -1, "slow": 3},
+    {"id": "zero_slow", "fast": 2, "slow": 0},
+    {"id": "negative_slow", "fast": 2, "slow": -1},
+    {"id": "noninteger_fast", "fast": 2.5, "slow": 3},
+    {"id": "noninteger_slow", "fast": 2, "slow": 3.5},
+    {"id": "slow_below_fast", "fast": 4, "slow": 3}
+  ]
+}
